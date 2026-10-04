@@ -1,0 +1,27 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+license = "MIT"
+
+[[mods]]
+modId = "argentinaflags"
+version = "1.0.0"
+displayName = "Argentina Flags"
+authors = "Argentina Flags"
+description = '''
+Banderas argentinas decorativas y crafteables: la bandera nacional, la Confederacion, la Liga Federal y varias provincias.
+Decorative, craftable Argentine flags: national flag, Confederation, Federal League and several provinces.
+'''
+
+[[dependencies.argentinaflags]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1.0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.argentinaflags]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1,1.22)"
+ordering = "NONE"
+side = "BOTH"
