@@ -1,0 +1,54 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "minecraft:block/spruce_planks",
+    "pole": "minecraft:block/spruce_planks",
+    "gold": "minecraft:block/gold_block"
+  },
+  "elements": [
+    {
+      "from": [-6.5, 13, 13], "to": [22.5, 14, 14],
+      "faces": {
+        "north": {"texture": "#pole"}, "south": {"texture": "#pole"},
+        "up": {"texture": "#pole"}, "down": {"texture": "#pole"}
+      }
+    },
+    {
+      "from": [1, 13, 14], "to": [2, 14, 16],
+      "faces": {
+        "north": {"texture": "#pole"}, "east": {"texture": "#pole"}, "west": {"texture": "#pole"},
+        "up": {"texture": "#pole"}, "down": {"texture": "#pole"}
+      }
+    },
+    {
+      "from": [14, 13, 14], "to": [15, 14, 16],
+      "faces": {
+        "north": {"texture": "#pole"}, "east": {"texture": "#pole"}, "west": {"texture": "#pole"},
+        "up": {"texture": "#pole"}, "down": {"texture": "#pole"}
+      }
+    },
+    {
+      "from": [-7.5, 12.5, 12.5], "to": [-6.5, 14.5, 14.5],
+      "faces": {
+        "north": {"texture": "#gold"}, "south": {"texture": "#gold"},
+        "east": {"texture": "#gold"}, "west": {"texture": "#gold"},
+        "up": {"texture": "#gold"}, "down": {"texture": "#gold"}
+      }
+    },
+    {
+      "from": [22.5, 12.5, 12.5], "to": [23.5, 14.5, 14.5],
+      "faces": {
+        "north": {"texture": "#gold"}, "south": {"texture": "#gold"},
+        "east": {"texture": "#gold"}, "west": {"texture": "#gold"},
+        "up": {"texture": "#gold"}, "down": {"texture": "#gold"}
+      }
+    },
+    {
+      "from": [-6, -5, 12.5], "to": [22, 13, 13],
+      "faces": {
+        "north": {"uv": [0, 0, 14, 9], "texture": "#flag"},
+        "south": {"uv": [14, 0, 0, 9], "texture": "#flag"}
+      }
+    }
+  ]
+}
