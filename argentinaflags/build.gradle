@@ -1,0 +1,60 @@
+plugins {
+    id 'java-library'
+    id 'idea'
+    id 'net.neoforged.moddev' version '2.0.78'
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+neoForge {
+    // NeoForge para Minecraft 1.21.1 (serie 21.1.x)
+    version = project.neo_version
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------
+// Generacion automatica de texturas PNG, modelos, blockstates, recetas, loot tables y lang.
+// Se ejecuta con el mismo JDK que usa Gradle (java tools/AssetGenerator.java <salida>).
+// ---------------------------------------------------------------------------------------
+def generatedAssetsDir = layout.buildDirectory.dir('generated/flag-assets')
+
+def generateAssets = tasks.register('generateAssets', Exec) {
+    def outDir = generatedAssetsDir.get().asFile
+    inputs.file('tools/AssetGenerator.java')
+    outputs.dir(outDir)
+    workingDir = projectDir
+    commandLine new File(System.getProperty('java.home'), 'bin/java').absolutePath,
+            'tools/AssetGenerator.java', outDir.absolutePath
+}
+
+sourceSets.main.resources.srcDir(generatedAssetsDir)
+
+tasks.named('processResources') {
+    dependsOn generateAssets
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
