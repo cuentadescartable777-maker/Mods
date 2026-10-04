@@ -33,3 +33,8 @@ Texturas, modelos, blockstates, recetas, loot tables y lang (en_us / es_ar) se g
 1. Crea un repositorio en GitHub y sube todo el contenido de esta carpeta (incluida `.github`).
 2. Entra en la pestana Actions, abre la ejecucion "Build mod" y espera a que termine (unos minutos).
 3. Al final de la pagina, en Artifacts, descarga `argentinaflags-jar` (es un zip con el .jar adentro).
+
+## Mastil extensible, Rosas y discos (v1.1)
+- Mastil: item "Flag Pole" (3 palos en columna = 3 mastiles). Clic derecho sobre una bandera de suelo con un mastil la sube un bloque.
+- Bandera de la Confederacion (epoca de Rosas): sol rojo y gorros frigios en las esquinas.
+- Discos: ver sounds/music_disc/LEEME.txt (hay que agregar los .ogg y ajustar la duracion).

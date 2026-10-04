@@ -33,6 +33,9 @@ public class AssetGenerator {
     static final int GOLD = 0xFFF6B40E, GOLD_EDGE = 0xFF85340A, YELLOW = 0xFFF4C20D, DARK = 0xFF3A2A18;
     static final int SNOW_GRAY = 0xFF6B7B8C, SKIN = 0xFFE0B07A;
 
+    /** Duracion (en segundos) de cada cancion. AJUSTAR a la duracion real de tu archivo .ogg. */
+    static final double HIMNO_SECONDS = 90, MARCHA_SECONDS = 150;
+
     record Flag(String id, String en, String es, String pattern, String keys, Consumer<BufferedImage> painter) {}
 
     static List<Flag> flags() {
@@ -47,6 +50,10 @@ public class AssetGenerator {
                 "Bandera de la Confederaci\u00f3n Argentina",
                 "BBB/WWW/ T ", "B=minecraft:blue_wool;W=minecraft:white_wool;T=minecraft:stick",
                 AssetGenerator::confederacion));
+        l.add(new Flag("flag_confederacion_rosas", "Flag of the Confederation (Rosas era)",
+                "Bandera de la Confederaci\u00f3n (\u00e9poca de Rosas)",
+                "BRB/WWW/ T ", "B=minecraft:blue_wool;R=minecraft:red_wool;W=minecraft:white_wool;T=minecraft:stick",
+                AssetGenerator::confederacionRosas));
         l.add(new Flag("flag_liga_federal", "Flag of the Federal League", "Bandera de la Liga Federal",
                 "BWB/WRW/ T ", "B=minecraft:blue_wool;W=minecraft:white_wool;R=minecraft:red_wool;T=minecraft:stick",
                 AssetGenerator::ligaFederal));
@@ -88,6 +95,43 @@ public class AssetGenerator {
     static void confederacion(BufferedImage im) {
         horizontal3(im, NAVY, WHITE, NAVY);
         sun(im, 56, 36, 11.5, 16, true, 0);
+    }
+
+    /** Confederacion de la epoca de Rosas: sol rojo (punzo) y gorros frigios rojos en las cuatro esquinas. */
+    static void confederacionRosas(BufferedImage im) {
+        horizontal3(im, NAVY, WHITE, NAVY);
+        sun(im, 56, 36, 14, 24, true, 0, 0xFFD01030, 0xFF6B0A18);
+        cap(im, 3, 3, false);
+        cap(im, FW - 3 - 14, 3, true);
+        cap(im, 3, FH - 3 - 13, false);
+        cap(im, FW - 3 - 14, FH - 3 - 13, true);
+    }
+
+    /** Gorro frigio de 14x13 px: cuerpo rojo, punta curvada, banda inferior y contorno oscuro. */
+    static void cap(BufferedImage im, int x, int y, boolean mirror) {
+        int w = 14, h = 13;
+        boolean[][] m = new boolean[h][w];
+        for (int j = 0; j < h; j++) {
+            for (int i = 0; i < w; i++) {
+                double bx = (i + 0.5 - 6) / 5.5, by = (j + 0.5 - 7) / 4.5;
+                double tx = (i + 0.5 - 9) / 2.6, ty = (j + 0.5 - 3) / 2.4;
+                double ux = (i + 0.5 - 11.6) / 1.9, uy = (j + 0.5 - 3.6) / 1.9;
+                double vx = (i + 0.5 - 12.6) / 1.2, vy = (j + 0.5 - 6) / 1.8;
+                boolean body = bx * bx + by * by <= 1.0 || tx * tx + ty * ty <= 1.0
+                        || ux * ux + uy * uy <= 1.0 || vx * vx + vy * vy <= 1.0;
+                boolean band = j >= 10 && j <= 12 && i >= 1 && i <= 11;
+                m[j][i] = body || band;
+            }
+        }
+        for (int j = 0; j < h; j++) {
+            for (int i = 0; i < w; i++) {
+                if (!m[j][i]) continue;
+                boolean edge = i == 0 || j == 0 || i == w - 1 || j == h - 1
+                        || !m[j][i - 1] || !m[j][i + 1] || !m[j - 1][i] || !m[j + 1][i];
+                int c = edge ? 0xFF6B0A18 : (j >= 10 ? 0xFFA00C22 : 0xFFD01030);
+                set(im, x + (mirror ? w - 1 - i : i), y + j, c);
+            }
+        }
     }
 
     static void ligaFederal(BufferedImage im) {
@@ -267,6 +311,11 @@ public class AssetGenerator {
      * clip: 0 = completo, -1 = solo mitad superior, +1 = solo mitad inferior.
      */
     static void sun(BufferedImage im, double cx, double cy, double radius, int rays, boolean face, int clip) {
+        sun(im, cx, cy, radius, rays, face, clip, GOLD, GOLD_EDGE);
+    }
+
+    static void sun(BufferedImage im, double cx, double cy, double radius, int rays, boolean face, int clip,
+                    int fillColor, int edgeColor) {
         double r0 = radius * 0.46, step = 2 * Math.PI / rays;
         int w = im.getWidth(), h = im.getHeight();
         boolean[][] m = new boolean[h][w];
@@ -296,17 +345,68 @@ public class AssetGenerator {
                 if (!m[y][x]) continue;
                 boolean edge = x == 0 || y == 0 || x == w - 1 || y == h - 1
                         || !m[y][x - 1] || !m[y][x + 1] || !m[y - 1][x] || !m[y + 1][x];
-                set(im, x, y, edge ? GOLD_EDGE : GOLD);
+                set(im, x, y, edge ? edgeColor : fillColor);
             }
         }
         if (face && radius >= 8) {
             int ex = (int) Math.round(radius * 0.2), ey = (int) Math.round(cy - radius * 0.12);
-            set(im, (int) Math.round(cx) - ex - 1, ey, GOLD_EDGE);
-            set(im, (int) Math.round(cx) + ex, ey, GOLD_EDGE);
-            set(im, (int) Math.round(cx) - 1, (int) Math.round(cy + radius * 0.05), GOLD_EDGE);
+            set(im, (int) Math.round(cx) - ex - 1, ey, edgeColor);
+            set(im, (int) Math.round(cx) + ex, ey, edgeColor);
+            set(im, (int) Math.round(cx) - 1, (int) Math.round(cy + radius * 0.05), edgeColor);
             int my = (int) Math.round(cy + radius * 0.22);
-            for (int x = (int) Math.round(cx - radius * 0.17); x < (int) Math.round(cx + radius * 0.17); x++) set(im, x, my, GOLD_EDGE);
+            for (int x = (int) Math.round(cx - radius * 0.17); x < (int) Math.round(cx + radius * 0.17); x++) set(im, x, my, edgeColor);
         }
+    }
+
+    /** Icono 32x32 de inventario: bandera reducida junto a un mastil. */
+    static BufferedImage icon(BufferedImage flag) {
+        BufferedImage ic = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
+        int dw = 26, dh = 17, ox = 5, oy = 5;
+        for (int y = 0; y < dh; y++) {
+            for (int x = 0; x < dw; x++) {
+                int sx0 = x * FW / dw, sx1 = Math.max(sx0 + 1, (x + 1) * FW / dw);
+                int sy0 = y * FH / dh, sy1 = Math.max(sy0 + 1, (y + 1) * FH / dh);
+                long r = 0, g = 0, b = 0;
+                int n = 0;
+                for (int sy = sy0; sy < sy1; sy++) {
+                    for (int sx = sx0; sx < sx1; sx++) {
+                        int c = flag.getRGB(sx, sy);
+                        r += (c >> 16) & 255;
+                        g += (c >> 8) & 255;
+                        b += c & 255;
+                        n++;
+                    }
+                }
+                ic.setRGB(ox + x, oy + y, 0xFF000000 | ((int) (r / n) << 16) | ((int) (g / n) << 8) | (int) (b / n));
+            }
+        }
+        fill(ic, 3, 5, 5, 30, 0xFF7A5A2A);
+        fill(ic, 2, 2, 6, 5, GOLD);
+        return ic;
+    }
+
+    static BufferedImage poleIcon() {
+        BufferedImage ic = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        fill(ic, 7, 2, 9, 15, 0xFF7A5A2A);
+        fill(ic, 7, 2, 8, 15, 0xFF9A7A3A);
+        fill(ic, 6, 0, 10, 2, GOLD);
+        return ic;
+    }
+
+    static BufferedImage disc(int top, int bottom) {
+        BufferedImage im = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < 16; y++) {
+            for (int x = 0; x < 16; x++) {
+                double d = Math.hypot(x + 0.5 - 8, y + 0.5 - 8);
+                if (d <= 7.4) im.setRGB(x, y, d > 6.4 ? 0xFF2E2E2E : 0xFF111111);
+                if (d <= 4.6) im.setRGB(x, y, y < 8 ? top : bottom);
+                if (d <= 1.0) im.setRGB(x, y, 0xFF111111);
+            }
+        }
+        im.setRGB(4, 3, 0xFF6A6A6A);
+        im.setRGB(5, 2, 0xFF6A6A6A);
+        im.setRGB(3, 4, 0xFF6A6A6A);
+        return im;
     }
 
     // =====================================================================================
@@ -326,6 +426,81 @@ public class AssetGenerator {
             else sb.append(ch);
         }
         return sb.toString();
+    }
+
+    static String faces(String tex, String... names) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < names.length; i++) {
+            sb.append(i > 0 ? ", " : "").append("\"").append(names[i]).append("\": {\"texture\": \"#").append(tex).append("\"}");
+        }
+        return sb.toString();
+    }
+
+    /** Mastil extensible, discos de musica, sonidos y textos de idioma asociados. */
+    static void extras(Path assets, Path data, StringBuilder en, StringBuilder es) throws IOException {
+        String all = faces("pole", "north", "south", "east", "west", "up", "down");
+
+        // --- Mastil (segmento apilable) ---
+        write(assets.resolve("models/block/flag_pole.json"),
+                "{\n  \"parent\": \"minecraft:block/block\",\n  \"textures\": {\n"
+                        + "    \"particle\": \"minecraft:block/spruce_planks\",\n    \"pole\": \"minecraft:block/spruce_planks\"\n  },\n"
+                        + "  \"elements\": [\n    {\"from\": [7, 0, 7], \"to\": [9, 16, 9], \"faces\": {" + all + "}}\n  ]\n}\n");
+        write(assets.resolve("blockstates/flag_pole.json"),
+                "{\n  \"variants\": {\n    \"\": {\"model\": \"" + MOD + ":block/flag_pole\"}\n  }\n}\n");
+        Path poleIcon = assets.resolve("textures/item/flag_pole.png");
+        Files.createDirectories(poleIcon.getParent());
+        ImageIO.write(poleIcon(), "png", poleIcon.toFile());
+        write(assets.resolve("models/item/flag_pole.json"),
+                "{\n  \"parent\": \"minecraft:item/generated\",\n  \"textures\": {\"layer0\": \"" + MOD + ":item/flag_pole\"}\n}\n");
+        write(data.resolve("loot_table/blocks/flag_pole.json"),
+                "{\n  \"type\": \"minecraft:block\",\n  \"pools\": [\n    {\n      \"bonus_rolls\": 0.0,\n"
+                        + "      \"conditions\": [{\"condition\": \"minecraft:survives_explosion\"}],\n"
+                        + "      \"entries\": [{\"type\": \"minecraft:item\", \"name\": \"" + MOD + ":flag_pole\"}],\n"
+                        + "      \"rolls\": 1.0\n    }\n  ],\n  \"random_sequence\": \"" + MOD + ":blocks/flag_pole\"\n}\n");
+        write(data.resolve("recipe/flag_pole.json"),
+                "{\n  \"type\": \"minecraft:crafting_shaped\",\n  \"category\": \"misc\",\n  \"pattern\": [\"T\", \"T\", \"T\"],\n"
+                        + "  \"key\": {\"T\": {\"item\": \"minecraft:stick\"}},\n"
+                        + "  \"result\": {\"id\": \"" + MOD + ":flag_pole\", \"count\": 3}\n}\n");
+        en.append(",\n  \"block.").append(MOD).append(".flag_pole\": \"Flag Pole\"");
+        es.append(",\n  \"block.").append(MOD).append(".flag_pole\": \"M\u00e1stil de bandera\"");
+
+        // --- Discos de musica ---
+        String[][] discs = {
+                {"himno_nacional", "Argentine National Anthem", "Himno Nacional Argentino", String.valueOf(HIMNO_SECONDS),
+                        "LWL", "WGW", "LWL", "L=minecraft:light_blue_dye;W=minecraft:white_dye;G=minecraft:gold_ingot"},
+                {"marcha_san_lorenzo", "March of San Lorenzo", "Marcha de San Lorenzo", String.valueOf(MARCHA_SECONDS),
+                        "RBR", "BGB", "RBR", "R=minecraft:red_dye;B=minecraft:blue_dye;G=minecraft:gold_ingot"}
+        };
+        int[][] colors = {{CELESTE, CELESTE}, {RED, BLUE}};
+        StringBuilder sounds = new StringBuilder("{\n");
+        for (int i = 0; i < discs.length; i++) {
+            String[] d = discs[i];
+            String id = d[0];
+            Path tex = assets.resolve("textures/item/music_disc_" + id + ".png");
+            Files.createDirectories(tex.getParent());
+            ImageIO.write(disc(colors[i][0], colors[i][1]), "png", tex.toFile());
+            write(assets.resolve("models/item/music_disc_" + id + ".json"),
+                    "{\n  \"parent\": \"minecraft:item/generated\",\n  \"textures\": {\"layer0\": \"" + MOD + ":item/music_disc_" + id + "\"}\n}\n");
+            write(data.resolve("jukebox_song/" + id + ".json"),
+                    "{\n  \"comparator_output\": " + (i + 1) + ",\n  \"description\": {\"translate\": \"jukebox_song." + MOD + "." + id + "\"},\n"
+                            + "  \"length_in_seconds\": " + d[3] + ",\n  \"sound_event\": \"" + MOD + ":music_disc." + id + "\"\n}\n");
+            StringBuilder r = new StringBuilder("{\n  \"type\": \"minecraft:crafting_shaped\",\n  \"category\": \"misc\",\n  \"pattern\": [\"")
+                    .append(d[4]).append("\", \"").append(d[5]).append("\", \"").append(d[6]).append("\"],\n  \"key\": {\n");
+            String[] keys = d[7].split(";");
+            for (int k = 0; k < keys.length; k++) {
+                String[] kv = keys[k].split("=");
+                r.append("    \"").append(kv[0]).append("\": {\"item\": \"").append(kv[1]).append("\"}").append(k < keys.length - 1 ? ",\n" : "\n");
+            }
+            r.append("  },\n  \"result\": {\"id\": \"").append(MOD).append(":music_disc_").append(id).append("\", \"count\": 1}\n}\n");
+            write(data.resolve("recipe/music_disc_" + id + ".json"), r.toString());
+            sounds.append("  \"music_disc.").append(id).append("\": {\"sounds\": [{\"name\": \"").append(MOD)
+                    .append(":music_disc/").append(id).append("\", \"stream\": true}]}").append(i < discs.length - 1 ? ",\n" : "\n");
+            en.append(",\n  \"item.").append(MOD).append(".music_disc_").append(id).append("\": \"Music Disc\"")
+                    .append(",\n  \"jukebox_song.").append(MOD).append(".").append(id).append("\": \"").append(esc(d[1])).append("\"");
+            es.append(",\n  \"item.").append(MOD).append(".music_disc_").append(id).append("\": \"Disco de m\u00fasica\"")
+                    .append(",\n  \"jukebox_song.").append(MOD).append(".").append(id).append("\": \"").append(esc(d[2])).append("\"");
+        }
+        write(assets.resolve("sounds.json"), sounds.append("}\n").toString());
     }
 
     public static void main(String[] args) throws IOException {
@@ -359,8 +534,11 @@ public class AssetGenerator {
                         "{\n  \"parent\": \"" + MOD + ":block/template_flag_" + kind + "\",\n"
                                 + "  \"textures\": {\n    \"flag\": \"" + MOD + ":block/" + f.id() + "\"\n  }\n}\n");
             }
+            Path iconPng = assets.resolve("textures/item/" + f.id() + ".png");
+            Files.createDirectories(iconPng.getParent());
+            ImageIO.write(icon(img), "png", iconPng.toFile());
             write(assets.resolve("models/item/" + f.id() + ".json"),
-                    "{\n  \"parent\": \"" + MOD + ":block/" + f.id() + "_floor\"\n}\n");
+                    "{\n  \"parent\": \"minecraft:item/generated\",\n  \"textures\": {\"layer0\": \"" + MOD + ":item/" + f.id() + "\"}\n}\n");
 
             // Blockstate
             StringBuilder bs = new StringBuilder("{\n  \"variants\": {\n");
@@ -398,6 +576,7 @@ public class AssetGenerator {
             en.append(",\n  \"block.").append(MOD).append(".").append(f.id()).append("\": \"").append(esc(f.en())).append("\"");
             es.append(",\n  \"block.").append(MOD).append(".").append(f.id()).append("\": \"").append(esc(f.es())).append("\"");
         }
+        extras(assets, data, en, es);
         write(assets.resolve("lang/en_us.json"), en.append("\n}\n").toString());
         write(assets.resolve("lang/es_ar.json"), es.append("\n}\n").toString());
 

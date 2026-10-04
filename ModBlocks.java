@@ -1,6 +1,7 @@
 package com.argentinaflags;
 
 import com.argentinaflags.block.FlagBlock;
+import com.argentinaflags.block.PoleBlock;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ public final class ModBlocks {
             "flag_argentina",
             "flag_argentina_sin_sol",
             "flag_confederacion",
+            "flag_confederacion_rosas",
             "flag_liga_federal",
             "flag_buenos_aires",
             "flag_cordoba",
@@ -25,6 +27,10 @@ public final class ModBlocks {
             "flag_entre_rios",
             "flag_patagonia"
     );
+
+    /** Segmento de mastil apilable: permite subir la bandera. */
+    public static final DeferredBlock<PoleBlock> FLAG_POLE =
+            BLOCKS.registerBlock("flag_pole", PoleBlock::new, PoleBlock.defaultProperties());
 
     public static final Map<String, DeferredBlock<FlagBlock>> FLAGS = new LinkedHashMap<>();
 

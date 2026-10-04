@@ -1,0 +1,6 @@
+Coloca aca tus dos archivos de audio (formato OGG Vorbis) con estos nombres exactos:
+
+  himno_nacional.ogg
+  marcha_san_lorenzo.ogg
+
+Despues ajusta la duracion en tools/AssetGenerator.java (HIMNO_SECONDS y MARCHA_SECONDS).

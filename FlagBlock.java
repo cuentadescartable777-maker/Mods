@@ -4,8 +4,15 @@ import java.util.EnumMap;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
@@ -21,17 +28,18 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * Bandera decorativa. Un mismo bloque sirve para dos usos:
- * <ul>
- *   <li>wall=false: mastil clavado en el suelo (se apoya sobre la cara superior de un bloque).</li>
- *   <li>wall=true: bandera colgada de una barra pegada a una pared (se apoya en el bloque de atras).</li>
- * </ul>
+ * wall=false: mastil sobre el suelo (o sobre segmentos de mastil); wall=true: bandera colgada de una barra en una pared.
  * FACING es la direccion hacia la que mira la cara frontal de la bandera.
+ *
+ * La tela se dibuja mas grande que el bloque (se extiende hacia los lados); las formas de seleccion
+ * se recortan al bloque. Para subir la bandera, hacer clic derecho sobre ella con un mastil en la mano.
  */
 public class FlagBlock extends Block {
 
@@ -40,16 +48,16 @@ public class FlagBlock extends Block {
 
     // Formas para FACING = north (se rotan para las otras direcciones).
     private static final VoxelShape FLOOR_BASE = Shapes.or(
-            Block.box(13, 0, 7, 15, 16, 9),
-            Block.box(0, 7.3, 7.75, 12, 15, 8.25),
-            Block.box(12, 14, 7.75, 13, 15, 8.25),
-            Block.box(12, 8, 7.75, 13, 9, 8.25));
-    private static final VoxelShape FLOOR_COLLISION_BASE = Block.box(13, 0, 7, 15, 16, 9);
+            Block.box(7, 0, 7, 9, 16, 9),
+            Block.box(0, 2.5, 7.75, 5, 16, 8.25),
+            Block.box(5, 14, 7.75, 7, 15, 8.25),
+            Block.box(5, 4, 7.75, 7, 5, 8.25));
+    private static final VoxelShape FLOOR_COLLISION_BASE = Block.box(7, 0, 7, 9, 16, 9);
     private static final VoxelShape WALL_BASE = Shapes.or(
-            Block.box(0.5, 13, 13, 15.5, 14, 14),
+            Block.box(0, 13, 13, 16, 14, 14),
             Block.box(1, 13, 14, 2, 14, 16),
             Block.box(14, 13, 14, 15, 14, 16),
-            Block.box(1, 4, 12.5, 15, 13, 13));
+            Block.box(0, 0, 12.5, 16, 13, 13));
 
     private static final Map<Direction, VoxelShape> FLOOR_SHAPES = rotations(FLOOR_BASE);
     private static final Map<Direction, VoxelShape> FLOOR_COLLISIONS = rotations(FLOOR_COLLISION_BASE);
@@ -82,10 +90,10 @@ public class FlagBlock extends Block {
 
         BlockState state;
         if (clickedFace.getAxis().isHorizontal()) {
-            // Se hizo clic en el costado de un bloque: bandera colgada en la pared.
+            // Clic en el costado de un bloque: bandera colgada en la pared.
             state = defaultBlockState().setValue(WALL, true).setValue(FACING, clickedFace);
         } else {
-            // Se hizo clic arriba de un bloque: bandera en mastil sobre el suelo.
+            // Clic arriba de un bloque: bandera en mastil sobre el suelo.
             state = defaultBlockState().setValue(WALL, false)
                     .setValue(FACING, context.getHorizontalDirection().getOpposite());
         }
@@ -100,7 +108,31 @@ public class FlagBlock extends Block {
             return level.getBlockState(supportPos).isFaceSturdy(level, supportPos, facing);
         }
         BlockPos below = pos.below();
-        return level.getBlockState(below).isFaceSturdy(level, below, Direction.UP);
+        BlockState belowState = level.getBlockState(below);
+        return belowState.getBlock() instanceof PoleBlock || belowState.isFaceSturdy(level, below, Direction.UP);
+    }
+
+    /** Clic derecho con un mastil: la bandera sube un bloque y su posicion actual pasa a ser mastil. */
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
+                                              Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (!state.getValue(WALL) && stack.getItem() instanceof BlockItem blockItem
+                && blockItem.getBlock() instanceof PoleBlock) {
+            BlockPos above = pos.above();
+            if (level.isOutsideBuildHeight(above) || !level.getBlockState(above).canBeReplaced()) {
+                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            }
+            if (!level.isClientSide) {
+                level.setBlock(pos, blockItem.getBlock().defaultBlockState(), Block.UPDATE_ALL);
+                level.setBlock(above, state, Block.UPDATE_ALL);
+                level.playSound(null, pos, SoundType.WOOD.getPlaceSound(), SoundSource.BLOCKS, 1.0F, 0.8F);
+                if (!player.getAbilities().instabuild) {
+                    stack.shrink(1);
+                }
+            }
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        }
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     @Override

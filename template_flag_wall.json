@@ -7,7 +7,7 @@
   },
   "elements": [
     {
-      "from": [0.5, 13, 13], "to": [15.5, 14, 14],
+      "from": [-6.5, 13, 13], "to": [22.5, 14, 14],
       "faces": {
         "north": {"texture": "#pole"}, "south": {"texture": "#pole"},
         "up": {"texture": "#pole"}, "down": {"texture": "#pole"}
@@ -28,7 +28,7 @@
       }
     },
     {
-      "from": [0, 12.5, 12.5], "to": [1, 14.5, 14.5],
+      "from": [-7.5, 12.5, 12.5], "to": [-6.5, 14.5, 14.5],
       "faces": {
         "north": {"texture": "#gold"}, "south": {"texture": "#gold"},
         "east": {"texture": "#gold"}, "west": {"texture": "#gold"},
@@ -36,7 +36,7 @@
       }
     },
     {
-      "from": [15, 12.5, 12.5], "to": [16, 14.5, 14.5],
+      "from": [22.5, 12.5, 12.5], "to": [23.5, 14.5, 14.5],
       "faces": {
         "north": {"texture": "#gold"}, "south": {"texture": "#gold"},
         "east": {"texture": "#gold"}, "west": {"texture": "#gold"},
@@ -44,7 +44,7 @@
       }
     },
     {
-      "from": [1, 4, 12.5], "to": [15, 13, 13],
+      "from": [-6, -5, 12.5], "to": [22, 13, 13],
       "faces": {
         "north": {"uv": [0, 0, 14, 9], "texture": "#flag"},
         "south": {"uv": [14, 0, 0, 9], "texture": "#flag"}
