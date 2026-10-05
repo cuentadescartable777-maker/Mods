@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "minecraft:block/spruce_planks",
+    "pole": "minecraft:block/spruce_planks",
+    "gold": "minecraft:block/gold_block"
+  },
+  "elements": [
+    {"from": [1, 13, 14], "to": [2, 14, 16], "faces": {"north": {"texture": "#pole"}, "south": {"texture": "#pole"}, "east": {"texture": "#pole"}, "west": {"texture": "#pole"}, "up": {"texture": "#pole"}, "down": {"texture": "#pole"}}},
+    {"from": [14, 13, 14], "to": [15, 14, 16], "faces": {"north": {"texture": "#pole"}, "south": {"texture": "#pole"}, "east": {"texture": "#pole"}, "west": {"texture": "#pole"}, "up": {"texture": "#pole"}, "down": {"texture": "#pole"}}}
+  ]
+}

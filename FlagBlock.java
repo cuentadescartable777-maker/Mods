@@ -17,9 +17,11 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -41,7 +43,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * La tela se dibuja mas grande que el bloque (se extiende hacia los lados); las formas de seleccion
  * se recortan al bloque. Para subir la bandera, hacer clic derecho sobre ella con un mastil en la mano.
  */
-public class FlagBlock extends Block {
+public class FlagBlock extends Block implements EntityBlock {
 
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty WALL = BooleanProperty.create("wall");
@@ -63,9 +65,31 @@ public class FlagBlock extends Block {
     private static final Map<Direction, VoxelShape> FLOOR_COLLISIONS = rotations(FLOOR_COLLISION_BASE);
     private static final Map<Direction, VoxelShape> WALL_SHAPES = rotations(WALL_BASE);
 
-    public FlagBlock(BlockBehaviour.Properties properties) {
+    private final String textureId;
+    private final boolean large;
+
+    /**
+     * @param textureId id de la bandera base (nombre del PNG en textures/block)
+     * @param large     true para la version grande (4 veces el area de la normal)
+     */
+    public FlagBlock(BlockBehaviour.Properties properties, String textureId, boolean large) {
         super(properties);
+        this.textureId = textureId;
+        this.large = large;
         registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(WALL, false));
+    }
+
+    public String getTextureId() {
+        return textureId;
+    }
+
+    public boolean isLarge() {
+        return large;
+    }
+
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new FlagBlockEntity(pos, state);
     }
 
     public static BlockBehaviour.Properties defaultProperties() {

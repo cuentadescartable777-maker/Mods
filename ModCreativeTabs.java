@@ -21,8 +21,7 @@ public final class ModCreativeTabs {
                         ModItems.FLAGS.values().forEach(item -> output.accept(item.get()));
                         output.accept(ModItems.FLAG_POLE.get());
                         output.accept(ModItems.SOL_DE_MAYO.get());
-                        output.accept(ModItems.MUSIC_DISC_HIMNO_NACIONAL.get());
-                        output.accept(ModItems.MUSIC_DISC_MARCHA_SAN_LORENZO.get());
+                        ModItems.DISCS.values().forEach(item -> output.accept(item.get()));
                     })
                     .build());
 

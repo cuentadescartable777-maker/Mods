@@ -75,6 +75,46 @@ public class AssetGenerator {
         l.add(new Flag("flag_patagonia", "Flag of Patagonia (fictional)", "Bandera de la Patagonia (ficticia)",
                 "CCC/BWB/ T ", "C=minecraft:light_blue_wool;B=minecraft:blue_wool;W=minecraft:white_wool;T=minecraft:stick",
                 AssetGenerator::patagonia));
+        nf(l, "flag_caba", "Flag of Buenos Aires City", "Bandera de la Ciudad Aut\u00f3noma de Buenos Aires",
+                "WWW", "WWW", "minecraft:coal", AssetGenerator::caba);
+        nf(l, "flag_canuelas", "Flag of Ca\u00f1uelas", "Bandera de Ca\u00f1uelas",
+                "CCC", "WWW", "minecraft:leather", AssetGenerator::canuelas);
+        nf(l, "flag_jujuy", "Flag of Jujuy", "Bandera de Jujuy",
+                "WWW", "WWW", "minecraft:feather", AssetGenerator::jujuy);
+        nf(l, "flag_salta", "Flag of Salta", "Bandera de Salta",
+                "RRR", "RRR", "minecraft:lapis_lazuli", AssetGenerator::salta);
+        nf(l, "flag_formosa", "Flag of Formosa", "Bandera de Formosa",
+                "CCC", "WWW", "minecraft:honeycomb", AssetGenerator::formosa);
+        nf(l, "flag_misiones", "Flag of Misiones", "Bandera de Misiones",
+                "RRR", "BBB", "minecraft:slime_ball", AssetGenerator::misiones);
+        nf(l, "flag_corrientes", "Flag of Corrientes", "Bandera de Corrientes",
+                "CCC", "WWW", "minecraft:clay_ball", AssetGenerator::corrientes);
+        nf(l, "flag_chaco", "Flag of Chaco", "Bandera del Chaco",
+                "GWC", "GWC", "minecraft:cocoa_beans", AssetGenerator::chaco);
+        nf(l, "flag_santiago_del_estero", "Flag of Santiago del Estero", "Bandera de Santiago del Estero",
+                "CWR", "CWR", "minecraft:redstone", AssetGenerator::santiagoDelEstero);
+        nf(l, "flag_tucuman", "Flag of Tucum\u00e1n", "Bandera de Tucum\u00e1n",
+                "WWW", "CCC", "minecraft:sugar_cane", AssetGenerator::tucuman);
+        nf(l, "flag_catamarca", "Flag of Catamarca", "Bandera de Catamarca",
+                "CCC", "WWW", "minecraft:copper_ingot", AssetGenerator::catamarca);
+        nf(l, "flag_la_rioja", "Flag of La Rioja", "Bandera de La Rioja",
+                "CCC", "WRW", "minecraft:flint", AssetGenerator::laRioja);
+        nf(l, "flag_san_juan", "Flag of San Juan", "Bandera de San Juan",
+                "CCC", "WWW", "minecraft:quartz", AssetGenerator::sanJuan);
+        nf(l, "flag_san_luis", "Flag of San Luis", "Bandera de San Luis",
+                "WWW", "WWW", "minecraft:bone", AssetGenerator::sanLuis);
+        nf(l, "flag_la_pampa", "Flag of La Pampa", "Bandera de La Pampa",
+                "CCC", "WWW", "minecraft:wheat", AssetGenerator::laPampa);
+        nf(l, "flag_rio_negro", "Flag of R\u00edo Negro", "Bandera de R\u00edo Negro",
+                "BBB", "WWW", "minecraft:apple", AssetGenerator::rioNegro);
+        nf(l, "flag_chubut", "Flag of Chubut", "Bandera de Chubut",
+                "CCC", "YYY", "minecraft:string", AssetGenerator::chubut);
+        nf(l, "flag_santa_cruz", "Flag of Santa Cruz", "Bandera de Santa Cruz",
+                "CCC", "WWW", "minecraft:paper", AssetGenerator::santaCruz);
+        nf(l, "flag_tierra_del_fuego", "Flag of Tierra del Fuego", "Bandera de Tierra del Fuego (Ushuaia)",
+                "BBB", "WWW", "minecraft:glowstone_dust", AssetGenerator::tierraDelFuego);
+        nf(l, "flag_malvinas", "Flag of the Malvinas Islands", "Bandera de las Islas Malvinas Argentinas",
+                "CCC", "WWW", "minecraft:carrot", AssetGenerator::malvinas);
         return l;
     }
 
@@ -193,7 +233,7 @@ public class AssetGenerator {
     }
 
     static void santaFe(BufferedImage im) {
-        vertical3(im, RED, WHITE, CELESTE);
+        vertical3(im, CELESTE, WHITE, RED);
         ellipse(im, 56, 36, 18, 28, YELLOW);
         ellipse(im, 56, 36, 14, 24, 0xFFEAF2FA);
         // leyenda "Provincia invencible de Santa Fe" (sugerida con marcas oscuras)
@@ -261,6 +301,297 @@ public class AssetGenerator {
         for (int[] s : stars) {
             fill(im, s[0] - 1, s[1], s[0] + 2, s[1] + 1, GOLD);
             fill(im, s[0], s[1] - 1, s[0] + 1, s[1] + 2, GOLD);
+        }
+    }
+
+    static final String KEYS_ALL = "C=minecraft:light_blue_wool;W=minecraft:white_wool;B=minecraft:blue_wool;"
+            + "R=minecraft:red_wool;G=minecraft:green_wool;Y=minecraft:yellow_wool;K=minecraft:black_wool";
+
+    /** Registra una bandera nueva: dos filas de lana, un emblema unico y un palo ("E T") en la fila de abajo. */
+    static void nf(List<Flag> l, String id, String en, String es, String top, String mid, String emblem,
+                   Consumer<BufferedImage> painter) {
+        String pattern = top + "/" + mid + "/E T";
+        StringBuilder keys = new StringBuilder();
+        for (String kv : KEYS_ALL.split(";")) {
+            if ((top + mid).indexOf(kv.charAt(0)) >= 0) keys.append(kv).append(";");
+        }
+        keys.append("E=").append(emblem).append(";T=minecraft:stick");
+        l.add(new Flag(id, en, es, pattern, keys.toString(), painter));
+    }
+
+    // =====================================================================================
+    //  Banderas provinciales y municipales (v1.2)
+    // =====================================================================================
+
+    static final int BORDO = 0xFF7B1E2B, SILVER = 0xFFD0D5DA, BLACK = 0xFF161616, BROWN = 0xFF7A5230, HILL = 0xFF4E7A3A;
+    static final int PUNZO = 0xFFB5122E;
+
+    /** Escudo de la Asamblea del Ano XIII, simplificado (s = escala; 1.0 = tamano del escudo de Mendoza). */
+    static void shield(BufferedImage im, int cx, int cy, double s) {
+        double rx = 13 * s, ry = 18 * s;
+        for (int y = 0; y < FH; y++) {
+            for (int x = 0; x < FW; x++) {
+                double dx = (x + 0.5 - cx) / (rx * 1.38), dy = (y + 0.5 - (cy + 2 * s)) / (ry * 1.28);
+                double d = Math.sqrt(dx * dx + dy * dy);
+                if (d >= 1.0 && d <= 1.22 && y > cy - 4 * s) set(im, x, y, GREEN);
+            }
+        }
+        ellipse(im, cx, cy, rx + 1, ry + 1, GOLD_EDGE);
+        for (int y = 0; y < FH; y++) {
+            for (int x = 0; x < FW; x++) {
+                double dx = (x + 0.5 - cx) / rx, dy = (y + 0.5 - cy) / ry;
+                if (dx * dx + dy * dy <= 1.0) set(im, x, y, y < cy ? CELESTE : WHITE);
+            }
+        }
+        line(im, cx, cy - 16 * s, cx, cy + 10 * s, 1, GOLD);
+        fill(im, (int) (cx - 4 * s), (int) (cy - 16 * s), (int) (cx + 5 * s), (int) (cy - 13 * s), RED);
+        fill(im, (int) (cx - 2 * s), (int) (cy - 19 * s), (int) (cx + 3 * s), (int) (cy - 16 * s), RED);
+        fill(im, (int) (cx - 5 * s), (int) (cy + 2 * s), (int) (cx + 6 * s), (int) (cy + 6 * s), SKIN);
+        fill(im, (int) (cx - s), (int) (cy + 2 * s), (int) (cx + s + 1), (int) (cy + 6 * s), GOLD_EDGE);
+        sun(im, cx, cy - 19 * s, 10 * s, 16, false, -1);
+    }
+
+    /** Puntos distribuidos en una elipse (estrellas, hojas, espigas...). */
+    static void ring(BufferedImage im, double cx, double cy, double rx, double ry, int n, int size, int c) {
+        for (int i = 0; i < n; i++) {
+            double a = -Math.PI / 2 + 2 * Math.PI * i / n;
+            int x = (int) Math.round(cx + rx * Math.cos(a)), y = (int) Math.round(cy + ry * Math.sin(a));
+            fill(im, x - size / 2, y - size / 2, x - size / 2 + size, y - size / 2 + size, c);
+        }
+    }
+
+    static void star6(BufferedImage im, int cx, int cy, double r, int c) {
+        for (int y = cy - (int) r - 1; y <= cy + (int) r + 1; y++) {
+            for (int x = cx - (int) r - 1; x <= cx + (int) r + 1; x++) {
+                double dx = x + 0.5 - cx, dy = y + 0.5 - cy, d = Math.hypot(dx, dy);
+                double ang = Math.atan2(dy, dx);
+                if (d <= r * (0.4 + 0.6 * Math.pow(Math.abs(Math.cos(3 * ang)), 1.5))) set(im, x, y, c);
+            }
+        }
+    }
+
+    static void plus(BufferedImage im, int cx, int cy, int c) {
+        fill(im, cx - 1, cy, cx + 2, cy + 1, c);
+        fill(im, cx, cy - 1, cx + 1, cy + 2, c);
+    }
+
+    /** Dos ramas de hojas a los lados de (cx, cy). */
+    static void branches(BufferedImage im, int cx, int cy, double r, int leaves, int c) {
+        for (int i = 0; i < leaves; i++) {
+            double a = Math.toRadians(100 + i * (160.0 / Math.max(1, leaves - 1)));
+            int lx = (int) Math.round(cx + r * Math.cos(a)), ly = (int) Math.round(cy + r * Math.sin(a));
+            fill(im, lx - 1, ly - 1, lx + 2, ly + 1, c);
+            fill(im, 2 * cx - lx - 1, ly - 1, 2 * cx - lx + 2, ly + 1, c);
+        }
+    }
+
+    /** Aguila negra coronada del escudo de Garay (Ciudad de Buenos Aires), simplificada. */
+    static void eagle(BufferedImage im, int cx, int cy) {
+        ellipse(im, cx - 14, cy + 2, 12, 6, BLACK);
+        ellipse(im, cx + 14, cy + 2, 12, 6, BLACK);
+        ellipse(im, cx, cy + 4, 7, 11, BLACK);
+        ellipse(im, cx - 3, cy - 11, 4.5, 4.5, BLACK);
+        fill(im, cx - 10, cy - 12, cx - 6, cy - 10, YELLOW);
+        fill(im, cx - 8, cy - 17, cx - 1, cy - 15, GOLD);
+        fill(im, cx - 8, cy - 19, cx - 6, cy - 17, GOLD);
+        fill(im, cx - 5, cy - 20, cx - 3, cy - 17, GOLD);
+        fill(im, cx - 2, cy - 19, cx, cy - 17, GOLD);
+        fill(im, cx + 12, cy + 8, cx + 15, cy + 24, RED);
+        fill(im, cx + 8, cy + 13, cx + 19, cy + 16, RED);
+        for (int i = 0; i < 4; i++) ellipse(im, cx - 13 + i * 8.5, cy + 25, 3.2, 2.6, BLACK);
+    }
+
+    static void caba(BufferedImage im) {
+        fill(im, 0, 0, FW, FH, WHITE);
+        eagle(im, 56, 34);
+    }
+
+    /** Diseno propio aproximado (no se encontro una fuente oficial): cielo, llanura y sol naciente. */
+    static void canuelas(BufferedImage im) {
+        fill(im, 0, 0, FW, 44, CELESTE);
+        fill(im, 0, 44, FW, FH, HILL);
+        sun(im, 56, 44, 13, 16, false, -1);
+    }
+
+    static void jujuy(BufferedImage im) {
+        fill(im, 0, 0, FW, FH, WHITE);
+        shield(im, 56, 38, 1.15);
+    }
+
+    static void salta(BufferedImage im) {
+        fill(im, 0, 0, FW, FH, BORDO);
+        ring(im, 56, 36, 28, 28, 23, 3, YELLOW);
+        ellipse(im, 56, 36, 17, 20, GOLD_EDGE);
+        ellipse(im, 56, 36, 15.5, 18.5, 0xFF1E4FA0);
+        star6(im, 56, 36, 13, SILVER);
+        sun(im, 56, 36, 5.5, 12, false, 0);
+    }
+
+    static void formosa(BufferedImage im) {
+        fill(im, 0, 0, FW, 36, CELESTE);
+        fill(im, 0, 36, FW, FH, WHITE);
+        for (int x = 2; x < FW - 2; x += 4) {
+            int y = 36 + (int) Math.round(2 * Math.sin(x / 5.0));
+            fill(im, x - 1, y - 1, x + 2, y + 2, LEAF);
+        }
+        ring(im, 56, 36, 13, 13, 9, 3, YELLOW);
+    }
+
+    static void misiones(BufferedImage im) {
+        fill(im, 0, 0, FW, 24, RED);
+        fill(im, 0, 24, FW, 48, BLUE);
+        fill(im, 0, 48, FW, FH, WHITE);
+    }
+
+    static void corrientes(BufferedImage im) {
+        horizontal3(im, CELESTE, WHITE, CELESTE);
+        for (int y = 24; y < 48; y++) {
+            double w = 20 * (1 - Math.abs(y + 0.5 - 36) / 12.0);
+            fill(im, 0, y, (int) w, y + 1, CELESTE);
+        }
+        shield(im, 56, 36, 0.95);
+    }
+
+    static void chaco(BufferedImage im) {
+        vertical3(im, GREEN, WHITE, CELESTE);
+        ring(im, 56, 36, 16, 16, 25, 2, YELLOW);
+        sun(im, 56, 36, 9, 16, false, 0);
+    }
+
+    static void santiagoDelEstero(BufferedImage im) {
+        fill(im, 0, 0, 22, FH, CELESTE);
+        fill(im, 22, 0, 33, FH, WHITE);
+        fill(im, 33, 0, 79, FH, PUNZO);
+        fill(im, 79, 0, 90, FH, WHITE);
+        fill(im, 90, 0, FW, FH, CELESTE);
+        sun(im, 56, 36, 15, 16, false, 0);
+        line(im, 56, 25, 56, 49, 2, PUNZO);
+        line(im, 49, 32, 63, 32, 2, PUNZO);
+    }
+
+    static void tucuman(BufferedImage im) {
+        horizontal3(im, WHITE, CELESTE, WHITE);
+    }
+
+    /** Aproximada: el diseno de 2011 lleva un sol y dos ramas de olivo; los colores de fondo no pude verificarlos. */
+    static void catamarca(BufferedImage im) {
+        horizontal3(im, CELESTE, WHITE, CELESTE);
+        sun(im, 56, 36, 11, 32, false, 0);
+        branches(im, 56, 36, 18, 8, LEAF);
+    }
+
+    /** Aproximada: franja roja federal, celeste y blanco, con ramas de laurel. */
+    static void laRioja(BufferedImage im) {
+        fill(im, 0, 0, FW, 26, CELESTE);
+        fill(im, 0, 26, FW, 46, RED);
+        fill(im, 0, 46, FW, FH, WHITE);
+        branches(im, 56, 36, 17, 9, LEAF);
+        sun(im, 56, 36, 6, 12, false, 0);
+    }
+
+    static void sanJuan(BufferedImage im) {
+        horizontal3(im, CELESTE, WHITE, CELESTE);
+        shield(im, 56, 36, 1.0);
+    }
+
+    static void sanLuis(BufferedImage im) {
+        fill(im, 0, 0, FW, FH, WHITE);
+        ring(im, 56, 36, 21, 27, 26, 2, LEAF);
+        ellipse(im, 56, 36, 17, 23, GOLD_EDGE);
+        ellipse(im, 56, 36, 15.5, 21.5, CELESTE);
+        int[] hx = {46, 53, 60, 67}, hh = {10, 13, 11, 9};
+        for (int k = 0; k < hx.length; k++) {
+            for (int dy = 0; dy < hh[k]; dy++) {
+                fill(im, hx[k] - dy, 50 - hh[k] + dy, hx[k] + dy + 1, 51 - hh[k] + dy, HILL);
+            }
+        }
+        fill(im, 43, 50, 70, 55, HILL);
+        sun(im, 56, 36, 8, 12, false, -1);
+        ellipse(im, 49, 52, 3.5, 2, BROWN);
+        ellipse(im, 63, 52, 3.5, 2, BROWN);
+    }
+
+    static void laPampa(BufferedImage im) {
+        horizontal3(im, CELESTE, WHITE, CELESTE);
+        ring(im, 56, 36, 18, 24, 22, 2, GOLD);
+        for (int y = 0; y < FH; y++) {
+            for (int x = 0; x < FW; x++) {
+                double dx = (x + 0.5 - 56) / 14.0, dy = (y + 0.5 - 36) / 20.0;
+                if (dx * dx + dy * dy <= 1.0) set(im, x, y, y < 44 ? CELESTE : HILL);
+            }
+        }
+        line(im, 56, 44, 56, 32, 2, BROWN);
+        ellipse(im, 56, 30, 7, 4.5, GREEN);
+    }
+
+    static void rioNegro(BufferedImage im) {
+        fill(im, 0, 0, FW, 24, BLUE);
+        fill(im, 0, 24, FW, 48, WHITE);
+        fill(im, 0, 48, FW, FH, GREEN);
+        fill(im, 0, 0, 32, 24, 0xFF111111);
+        ring(im, 16, 12, 8, 8, 13, 2, WHITE);
+    }
+
+    /** Aproximada: celeste y blanco divididos por una faja amarilla (cordillera en zigzag, mar ondulado) y un engranaje. */
+    static void chubut(BufferedImage im) {
+        fill(im, 0, 0, FW, 36, CELESTE);
+        fill(im, 0, 36, FW, FH, WHITE);
+        for (int x = 0; x < FW; x++) {
+            int top = 29 + ((x / 4) % 2 == 0 ? 0 : 2);
+            int bottom = 42 + (int) Math.round(2 * Math.sin(x / 5.0));
+            fill(im, x, top, x + 1, bottom, YELLOW);
+        }
+        ring(im, 56, 36, 9, 9, 10, 3, NAVY);
+        ellipse(im, 56, 36, 7, 7, NAVY);
+        ellipse(im, 56, 36, 4.5, 4.5, YELLOW);
+    }
+
+    /** Aproximada: cielo celeste, base blanca y Cruz del Sur dorada. */
+    static void santaCruz(BufferedImage im) {
+        fill(im, 0, 0, FW, 40, CELESTE);
+        fill(im, 0, 40, FW, FH, WHITE);
+        int[][] stars = {{50, 8}, {50, 30}, {40, 19}, {60, 17}, {54, 37}};
+        for (int[] s : stars) plus(im, s[0], s[1], GOLD);
+    }
+
+    /** Aproximada: azul, blanco y celeste con una estrella dorada. */
+    static void tierraDelFuego(BufferedImage im) {
+        fill(im, 0, 0, FW, 24, NAVY);
+        fill(im, 0, 24, FW, 48, WHITE);
+        fill(im, 0, 48, FW, FH, CELESTE);
+        star6(im, 56, 36, 10, GOLD);
+    }
+
+    /** Reinterpretacion no oficial: la bandera nacional con el Sol de Mayo y las islas. */
+    static void malvinas(BufferedImage im) {
+        horizontal3(im, CELESTE, WHITE, CELESTE);
+        sun(im, 56, 36, 11.5, 16, true, 0);
+        ellipse(im, 38, 61, 13, 3, 0xFF3E5648);
+        ellipse(im, 72, 62, 10, 2.5, 0xFF3E5648);
+    }
+
+    /**
+     * Distancia de atenuacion de los discos. En una jukebox el volumen es 4, asi que el alcance real
+     * en bloques es 4 x este valor (12 -> 48 bloques). El volumen baja linealmente con la distancia.
+     * IMPORTANTE: los .ogg deben ser MONO; un audio estereo no se atenua con la distancia.
+     */
+    static final int ATTENUATION_DISTANCE = 12;
+
+    static int dyeColor(String dye) {
+        switch (dye) {
+            case "light_blue": return CELESTE;
+            case "white": return WHITE;
+            case "red": return RED;
+            case "blue": return BLUE;
+            case "black": return 0xFF222222;
+            case "pink": return 0xFFF08CB4;
+            case "green": return GREEN;
+            case "orange": return 0xFFF08A1E;
+            case "yellow": return YELLOW;
+            case "gray": return 0xFF707070;
+            case "purple": return 0xFF8A3DB5;
+            case "magenta": return 0xFFC84BC8;
+            default: return WHITE;
         }
     }
 
@@ -359,7 +690,7 @@ public class AssetGenerator {
     }
 
     /** Icono 32x32 de inventario: bandera reducida junto a un mastil. */
-    static BufferedImage icon(BufferedImage flag) {
+    static BufferedImage icon(BufferedImage flag, boolean large) {
         BufferedImage ic = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
         int dw = 26, dh = 17, ox = 5, oy = 5;
         for (int y = 0; y < dh; y++) {
@@ -382,6 +713,10 @@ public class AssetGenerator {
         }
         fill(ic, 3, 5, 5, 30, 0xFF7A5A2A);
         fill(ic, 2, 2, 6, 5, GOLD);
+        if (large) {
+            fill(ic, 26, 25, 31, 30, GOLD_EDGE);
+            fill(ic, 27, 26, 30, 29, GOLD);
+        }
         return ic;
     }
 
@@ -465,36 +800,43 @@ public class AssetGenerator {
         es.append(",\n  \"block.").append(MOD).append(".flag_pole\": \"M\u00e1stil de bandera\"");
 
         // --- Discos de musica ---
+        // {id, titulo EN, titulo ES, duracion en segundos (AJUSTAR a tu .ogg), tinte 1, tinte 2}
         String[][] discs = {
-                {"himno_nacional", "Argentine National Anthem", "Himno Nacional Argentino", String.valueOf(HIMNO_SECONDS),
-                        "LWL", "WGW", "LWL", "L=minecraft:light_blue_dye;W=minecraft:white_dye;G=minecraft:gold_ingot"},
-                {"marcha_san_lorenzo", "March of San Lorenzo", "Marcha de San Lorenzo", String.valueOf(MARCHA_SECONDS),
-                        "RBR", "BGB", "RBR", "R=minecraft:red_dye;B=minecraft:blue_dye;G=minecraft:gold_ingot"}
+                {"himno_nacional", "Argentine National Anthem", "Himno Nacional Argentino", String.valueOf(HIMNO_SECONDS), "light_blue", "white"},
+                {"marcha_san_lorenzo", "March of San Lorenzo", "Marcha de San Lorenzo", String.valueOf(MARCHA_SECONDS), "red", "blue"},
+                {"marcha_malvinas", "Marcha de las Malvinas", "Marcha de las Malvinas", "180", "light_blue", "black"},
+                {"avenida_camelias", "Avenida de las Camelias", "Avenida de las Camelias", "180", "pink", "green"},
+                {"aurora", "Aurora", "Aurora", "180", "orange", "yellow"},
+                {"pucara_malvinas", "Pucar\u00e1 de Malvinas", "Pucar\u00e1 de Malvinas", "180", "gray", "white"},
+                {"sobreviviendo", "Sobreviviendo - Los del Fuego", "Sobreviviendo - Los del Fuego", "180", "red", "black"},
+                {"el_grandote", "El Grandote - Mc Caco", "El Grandote - Mc Caco", "180", "purple", "black"},
+                {"diablo_humahuaca", "El Diablo de Humahuaca", "El Diablo de Humahuaca", "180", "red", "yellow"},
+                {"campanas_noche", "Campanas en la Noche", "Campanas en la Noche", "180", "blue", "black"},
+                {"cara_tramposo", "Cara de Tramposo", "Cara de Tramposo", "180", "green", "black"},
+                {"estrella_federal", "Estrella Federal", "Estrella Federal", "180", "red", "white"},
+                {"reina_madre", "Reina Madre - Ra\u00fal Porchetto", "Reina Madre - Ra\u00fal Porchetto", "180", "magenta", "white"}
         };
-        int[][] colors = {{CELESTE, CELESTE}, {RED, BLUE}};
         StringBuilder sounds = new StringBuilder("{\n");
         for (int i = 0; i < discs.length; i++) {
             String[] d = discs[i];
             String id = d[0];
             Path tex = assets.resolve("textures/item/music_disc_" + id + ".png");
             Files.createDirectories(tex.getParent());
-            ImageIO.write(disc(colors[i][0], colors[i][1]), "png", tex.toFile());
+            ImageIO.write(disc(dyeColor(d[4]), dyeColor(d[5])), "png", tex.toFile());
             write(assets.resolve("models/item/music_disc_" + id + ".json"),
                     "{\n  \"parent\": \"minecraft:item/generated\",\n  \"textures\": {\"layer0\": \"" + MOD + ":item/music_disc_" + id + "\"}\n}\n");
             write(data.resolve("jukebox_song/" + id + ".json"),
                     "{\n  \"comparator_output\": " + (i + 1) + ",\n  \"description\": {\"translate\": \"jukebox_song." + MOD + "." + id + "\"},\n"
                             + "  \"length_in_seconds\": " + d[3] + ",\n  \"sound_event\": \"" + MOD + ":music_disc." + id + "\"\n}\n");
-            StringBuilder r = new StringBuilder("{\n  \"type\": \"minecraft:crafting_shaped\",\n  \"category\": \"misc\",\n  \"pattern\": [\"")
-                    .append(d[4]).append("\", \"").append(d[5]).append("\", \"").append(d[6]).append("\"],\n  \"key\": {\n");
-            String[] keys = d[7].split(";");
-            for (int k = 0; k < keys.length; k++) {
-                String[] kv = keys[k].split("=");
-                r.append("    \"").append(kv[0]).append("\": {\"item\": \"").append(kv[1]).append("\"}").append(k < keys.length - 1 ? ",\n" : "\n");
-            }
-            r.append("  },\n  \"result\": {\"id\": \"").append(MOD).append(":music_disc_").append(id).append("\", \"count\": 1}\n}\n");
-            write(data.resolve("recipe/music_disc_" + id + ".json"), r.toString());
+            String dx = "minecraft:" + d[4] + "_dye", dy = "minecraft:" + d[5] + "_dye";
+            write(data.resolve("recipe/music_disc_" + id + ".json"),
+                    "{\n  \"type\": \"minecraft:crafting_shaped\",\n  \"category\": \"misc\",\n  \"pattern\": [\"XYX\", \"YGY\", \"XYX\"],\n"
+                            + "  \"key\": {\n    \"X\": {\"item\": \"" + dx + "\"},\n    \"Y\": {\"item\": \"" + dy + "\"},\n"
+                            + "    \"G\": {\"item\": \"minecraft:gold_ingot\"}\n  },\n"
+                            + "  \"result\": {\"id\": \"" + MOD + ":music_disc_" + id + "\", \"count\": 1}\n}\n");
             sounds.append("  \"music_disc.").append(id).append("\": {\"sounds\": [{\"name\": \"").append(MOD)
-                    .append(":music_disc/").append(id).append("\", \"stream\": true}]}").append(i < discs.length - 1 ? ",\n" : "\n");
+                    .append(":music_disc/").append(id).append("\", \"stream\": true, \"attenuation_distance\": ")
+                    .append(ATTENUATION_DISTANCE).append("}]}").append(i < discs.length - 1 ? ",\n" : "\n");
             en.append(",\n  \"item.").append(MOD).append(".music_disc_").append(id).append("\": \"Music Disc\"")
                     .append(",\n  \"jukebox_song.").append(MOD).append(".").append(id).append("\": \"").append(esc(d[1])).append("\"");
             es.append(",\n  \"item.").append(MOD).append(".music_disc_").append(id).append("\": \"Disco de m\u00fasica\"")
@@ -521,60 +863,75 @@ public class AssetGenerator {
         StringBuilder es = new StringBuilder("{\n  \"itemGroup." + MOD + ".main\": \"Argentina Flags\",\n  \"item." + MOD + ".sol_de_mayo\": \"Sol de Mayo\"");
 
         for (Flag f : flags) {
-            // Textura
+            // Textura (compartida por la version normal y la grande)
             BufferedImage img = new BufferedImage(SIZE, SIZE, BufferedImage.TYPE_INT_ARGB);
             f.painter().accept(img);
             Path png = assets.resolve("textures/block/" + f.id() + ".png");
             Files.createDirectories(png.getParent());
             ImageIO.write(img, "png", png.toFile());
 
-            // Modelos de bloque (suelo y pared) e item
-            for (String kind : new String[]{"floor", "wall"}) {
-                write(assets.resolve("models/block/" + f.id() + "_" + kind + ".json"),
-                        "{\n  \"parent\": \"" + MOD + ":block/template_flag_" + kind + "\",\n"
-                                + "  \"textures\": {\n    \"flag\": \"" + MOD + ":block/" + f.id() + "\"\n  }\n}\n");
-            }
-            Path iconPng = assets.resolve("textures/item/" + f.id() + ".png");
-            Files.createDirectories(iconPng.getParent());
-            ImageIO.write(icon(img), "png", iconPng.toFile());
-            write(assets.resolve("models/item/" + f.id() + ".json"),
-                    "{\n  \"parent\": \"minecraft:item/generated\",\n  \"textures\": {\"layer0\": \"" + MOD + ":item/" + f.id() + "\"}\n}\n");
+            for (boolean large : new boolean[]{false, true}) {
+                String vid = f.id() + (large ? "_grande" : "");
+                String suffix = large ? "_large" : "";
 
-            // Blockstate
-            StringBuilder bs = new StringBuilder("{\n  \"variants\": {\n");
-            for (int w = 0; w < 2; w++) {
-                for (int i = 0; i < 4; i++) {
-                    bs.append("    \"facing=").append(dirs[i]).append(",wall=").append(w == 1).append("\": {\"model\": \"")
-                            .append(MOD).append(":block/").append(f.id()).append(w == 1 ? "_wall" : "_floor").append("\"");
-                    if (rot[i] != 0) bs.append(", \"y\": ").append(rot[i]);
-                    bs.append("}").append(w == 1 && i == 3 ? "\n" : ",\n");
+                // Modelos de bloque (suelo y pared): solo mastil/soporte; la tela la dibuja el renderer
+                for (String kind : new String[]{"floor", "wall"}) {
+                    write(assets.resolve("models/block/" + vid + "_" + kind + ".json"),
+                            "{\n  \"parent\": \"" + MOD + ":block/template_flag_" + kind + suffix + "\"\n}\n");
                 }
+
+                // Icono de inventario
+                Path iconPng = assets.resolve("textures/item/" + vid + ".png");
+                Files.createDirectories(iconPng.getParent());
+                ImageIO.write(icon(img, large), "png", iconPng.toFile());
+                write(assets.resolve("models/item/" + vid + ".json"),
+                        "{\n  \"parent\": \"minecraft:item/generated\",\n  \"textures\": {\"layer0\": \"" + MOD + ":item/" + vid + "\"}\n}\n");
+
+                // Blockstate
+                StringBuilder bs = new StringBuilder("{\n  \"variants\": {\n");
+                for (int w = 0; w < 2; w++) {
+                    for (int i = 0; i < 4; i++) {
+                        bs.append("    \"facing=").append(dirs[i]).append(",wall=").append(w == 1).append("\": {\"model\": \"")
+                                .append(MOD).append(":block/").append(vid).append(w == 1 ? "_wall" : "_floor").append("\"");
+                        if (rot[i] != 0) bs.append(", \"y\": ").append(rot[i]);
+                        bs.append("}").append(w == 1 && i == 3 ? "\n" : ",\n");
+                    }
+                }
+                bs.append("  }\n}\n");
+                write(assets.resolve("blockstates/" + vid + ".json"), bs.toString());
+
+                // Loot table (el bloque se suelta a si mismo)
+                write(data.resolve("loot_table/blocks/" + vid + ".json"),
+                        "{\n  \"type\": \"minecraft:block\",\n  \"pools\": [\n    {\n      \"bonus_rolls\": 0.0,\n"
+                                + "      \"conditions\": [{\"condition\": \"minecraft:survives_explosion\"}],\n"
+                                + "      \"entries\": [{\"type\": \"minecraft:item\", \"name\": \"" + MOD + ":" + vid + "\"}],\n"
+                                + "      \"rolls\": 1.0\n    }\n  ],\n  \"random_sequence\": \"" + MOD + ":blocks/" + vid + "\"\n}\n");
+
+                // Receta: la grande se fabrica con 4 banderas normales del mismo tipo
+                if (large) {
+                    write(data.resolve("recipe/" + vid + ".json"),
+                            "{\n  \"type\": \"minecraft:crafting_shaped\",\n  \"category\": \"misc\",\n  \"pattern\": [\"FF\", \"FF\"],\n"
+                                    + "  \"key\": {\"F\": {\"item\": \"" + MOD + ":" + f.id() + "\"}},\n"
+                                    + "  \"result\": {\"id\": \"" + MOD + ":" + vid + "\", \"count\": 1}\n}\n");
+                } else {
+                    String[] rows = f.pattern().split("/", -1);
+                    StringBuilder r = new StringBuilder("{\n  \"type\": \"minecraft:crafting_shaped\",\n  \"category\": \"misc\",\n  \"pattern\": [");
+                    for (int i = 0; i < rows.length; i++) r.append(i > 0 ? ", " : "").append("\"").append(rows[i]).append("\"");
+                    r.append("],\n  \"key\": {\n");
+                    String[] keys = f.keys().split(";");
+                    for (int i = 0; i < keys.length; i++) {
+                        String[] kv = keys[i].split("=");
+                        r.append("    \"").append(kv[0]).append("\": {\"item\": \"").append(kv[1]).append("\"}").append(i < keys.length - 1 ? ",\n" : "\n");
+                    }
+                    r.append("  },\n  \"result\": {\"id\": \"").append(MOD).append(":").append(vid).append("\", \"count\": 1}\n}\n");
+                    write(data.resolve("recipe/" + vid + ".json"), r.toString());
+                }
+
+                String nameEn = large ? "Large " + f.en() : f.en();
+                String nameEs = large ? f.es() + " grande" : f.es();
+                en.append(",\n  \"block.").append(MOD).append(".").append(vid).append("\": \"").append(esc(nameEn)).append("\"");
+                es.append(",\n  \"block.").append(MOD).append(".").append(vid).append("\": \"").append(esc(nameEs)).append("\"");
             }
-            bs.append("  }\n}\n");
-            write(assets.resolve("blockstates/" + f.id() + ".json"), bs.toString());
-
-            // Loot table (el bloque se suelta a si mismo)
-            write(data.resolve("loot_table/blocks/" + f.id() + ".json"),
-                    "{\n  \"type\": \"minecraft:block\",\n  \"pools\": [\n    {\n      \"bonus_rolls\": 0.0,\n"
-                            + "      \"conditions\": [{\"condition\": \"minecraft:survives_explosion\"}],\n"
-                            + "      \"entries\": [{\"type\": \"minecraft:item\", \"name\": \"" + MOD + ":" + f.id() + "\"}],\n"
-                            + "      \"rolls\": 1.0\n    }\n  ],\n  \"random_sequence\": \"" + MOD + ":blocks/" + f.id() + "\"\n}\n");
-
-            // Receta
-            String[] rows = f.pattern().split("/", -1);
-            StringBuilder r = new StringBuilder("{\n  \"type\": \"minecraft:crafting_shaped\",\n  \"category\": \"misc\",\n  \"pattern\": [");
-            for (int i = 0; i < rows.length; i++) r.append(i > 0 ? ", " : "").append("\"").append(rows[i]).append("\"");
-            r.append("],\n  \"key\": {\n");
-            String[] keys = f.keys().split(";");
-            for (int i = 0; i < keys.length; i++) {
-                String[] kv = keys[i].split("=");
-                r.append("    \"").append(kv[0]).append("\": {\"item\": \"").append(kv[1]).append("\"}").append(i < keys.length - 1 ? ",\n" : "\n");
-            }
-            r.append("  },\n  \"result\": {\"id\": \"").append(MOD).append(":").append(f.id()).append("\", \"count\": 1}\n}\n");
-            write(data.resolve("recipe/" + f.id() + ".json"), r.toString());
-
-            en.append(",\n  \"block.").append(MOD).append(".").append(f.id()).append("\": \"").append(esc(f.en())).append("\"");
-            es.append(",\n  \"block.").append(MOD).append(".").append(f.id()).append("\": \"").append(esc(f.es())).append("\"");
         }
         extras(assets, data, en, es);
         write(assets.resolve("lang/en_us.json"), en.append("\n}\n").toString());

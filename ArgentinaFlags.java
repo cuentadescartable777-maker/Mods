@@ -11,6 +11,7 @@ public class ArgentinaFlags {
 
     public ArgentinaFlags(IEventBus modEventBus) {
         ModBlocks.BLOCKS.register(modEventBus);
+        ModBlockEntities.BLOCK_ENTITIES.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
         ModSounds.SOUNDS.register(modEventBus);
         ModCreativeTabs.TABS.register(modEventBus);

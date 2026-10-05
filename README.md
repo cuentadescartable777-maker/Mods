@@ -38,3 +38,12 @@ Texturas, modelos, blockstates, recetas, loot tables y lang (en_us / es_ar) se g
 - Mastil: item "Flag Pole" (3 palos en columna = 3 mastiles). Clic derecho sobre una bandera de suelo con un mastil la sube un bloque.
 - Bandera de la Confederacion (epoca de Rosas): sol rojo y gorros frigios en las esquinas.
 - Discos: ver sounds/music_disc/LEEME.txt (hay que agregar los .ogg y ajustar la duracion).
+
+## v1.2: 31 banderas x2 tamanos, ondeo y 13 discos
+- 62 bloques de bandera: `flag_x` (normal) y `flag_x_grande` (4x el area). La grande se fabrica con 4 banderas normales iguales en un cuadrado 2x2.
+- Las banderas de suelo/mastil ondean (efecto del renderer, sin entidades); las de pared son estaticas.
+- Discos: copiar los .ogg (MONO) en `src/main/resources/assets/argentinaflags/sounds/music_disc/` con el nombre `<id>.ogg`
+  (himno_nacional, marcha_san_lorenzo, marcha_malvinas, avenida_camelias, aurora, pucara_malvinas, sobreviviendo,
+  el_grandote, diablo_humahuaca, campanas_noche, cara_tramposo, estrella_federal, reina_madre).
+- Duraciones: `tools/AssetGenerator.java`, tabla `discs` (cuarto valor de cada fila, en segundos).
+- Alcance del sonido: `ATTENUATION_DISTANCE` en el mismo archivo (alcance en bloques = 4 x valor).
